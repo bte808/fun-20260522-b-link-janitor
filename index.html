@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Link Janitor</title>
+    <link rel="stylesheet" href="./src/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Local link cleanup</p>
+          <h1>Link Janitor</h1>
+        </div>
+        <div class="top-actions" aria-label="Primary actions">
+          <button id="sampleButton" class="ghost" type="button">Sample</button>
+          <button id="clearButton" class="ghost" type="button">Clear</button>
+          <button id="analyzeButton" type="button">Clean links</button>
+        </div>
+      </header>
+
+      <section class="stats-grid" aria-label="Analysis summary">
+        <output class="stat" id="totalLinks">
+          <span>0</span>
+          <small>links</small>
+        </output>
+        <output class="stat" id="dedupedLinks">
+          <span>0</span>
+          <small>kept</small>
+        </output>
+        <output class="stat" id="trackingRemoved">
+          <span>0</span>
+          <small>params removed</small>
+        </output>
+        <output class="stat" id="domainCount">
+          <span>0</span>
+          <small>domains</small>
+        </output>
+      </section>
+
+      <section class="workbench" aria-label="Link cleaner">
+        <div class="input-panel">
+          <div class="panel-title">
+            <h2>Paste Dump</h2>
+            <label class="toggle">
+              <input id="stripTracking" type="checkbox" checked>
+              <span>Strip tracking</span>
+            </label>
+          </div>
+          <textarea id="rawInput" spellcheck="false" aria-label="Raw links"></textarea>
+        </div>
+
+        <div class="output-panel">
+          <div class="panel-title">
+            <h2>Export</h2>
+            <div class="format-toggle" role="group" aria-label="Export format">
+              <button id="markdownMode" class="selected" type="button">Markdown</button>
+              <button id="csvMode" type="button">CSV</button>
+            </div>
+          </div>
+          <textarea id="exportText" readonly spellcheck="false" aria-label="Cleaned export"></textarea>
+          <div class="export-actions">
+            <button id="copyButton" type="button">Copy</button>
+            <button id="downloadButton" class="ghost" type="button">Download</button>
+          </div>
+          <p id="statusLine" class="status" role="status">Ready.</p>
+        </div>
+      </section>
+
+      <section class="results-strip" aria-label="Cleaned links">
+        <div class="panel-title">
+          <h2>Cleaned List</h2>
+          <span id="warningCount" class="pill">0 warnings</span>
+        </div>
+        <div id="resultsList" class="results-list"></div>
+      </section>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
