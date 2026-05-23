@@ -12,9 +12,12 @@ const files = {
 assert.match(files.html, /<script type="module" src="\.\/src\/app\.js"><\/script>/);
 assert.match(files.html, /id="rawInput"/);
 assert.match(files.html, /id="exportText"/);
+assert.match(files.html, /id="customTrackingParams"/);
 assert.match(files.css, /@media \(max-width: 760px\)/);
 assert.match(files.app, /navigator\.clipboard/);
+assert.match(files.app, /parseTrackingParams/);
 assert.match(files.module, /export function analyzeLinks/);
+assert.match(files.module, /export function parseTrackingParams/);
 assert.match(files.readme, /fun-20260522-b-link-janitor/);
 
 const externalRefs = files.html.match(/https?:\/\//g) || [];

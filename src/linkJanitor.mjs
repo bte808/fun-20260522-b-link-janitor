@@ -44,6 +44,7 @@ const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"')\]]+/gi;
 export function analyzeLinks(rawText, options = {}) {
   const settings = {
     stripTracking: options.stripTracking !== false,
+    customTrackingParams: new Set(parseTrackingParams(options.customTrackingParams)),
     generatedAt: options.generatedAt || new Date()
   };
   const lines = String(rawText || "").split(/\r?\n/);
@@ -134,6 +135,9 @@ export function cleanUrl(input, settings = {}) {
   try {
     let url = new URL(withProtocol);
     const warnings = [];
+    const customTrackingParams = settings.customTrackingParams instanceof Set
+      ? settings.customTrackingParams
+      : new Set(parseTrackingParams(settings.customTrackingParams));
 
     const redirectCandidate = unwrapRedirect(url);
     if (redirectCandidate) {
@@ -145,7 +149,12 @@ export function cleanUrl(input, settings = {}) {
     if (settings.stripTracking !== false) {
       const params = [...url.searchParams.keys()];
       params.forEach((key) => {
-        if (trackingParams.has(key.toLowerCase()) || key.toLowerCase().startsWith("utm_")) {
+        const normalizedKey = key.toLowerCase();
+        if (
+          trackingParams.has(normalizedKey) ||
+          normalizedKey.startsWith("utm_") ||
+          customTrackingParams.has(normalizedKey)
+        ) {
           url.searchParams.delete(key);
           removedParams += 1;
         }
@@ -210,6 +219,14 @@ export function formatCsv(items) {
     ]);
   });
   return rows.map((row) => row.map(csvCell).join(",")).join("\n");
+}
+
+export function parseTrackingParams(value) {
+  const parts = Array.isArray(value) ? value : String(value || "").split(/[\s,]+/);
+
+  return unique(parts
+    .map((part) => String(part).trim().replace(/^[?&]+/, "").split("=")[0].toLowerCase())
+    .filter((part) => /^[a-z0-9_.:-]+$/.test(part)));
 }
 
 function unwrapRedirect(url) {

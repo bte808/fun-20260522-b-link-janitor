@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <title>Link Janitor</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f766e'/%3E%3Cpath d='M23 33a9 9 0 0 1 0-13l4-4a9 9 0 0 1 13 13l-2 2' fill='none' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M41 31a9 9 0 0 1 0 13l-4 4a9 9 0 0 1-13-13l2-2' fill='none' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="./src/styles.css">
   </head>
   <body>
@@ -44,10 +45,16 @@
         <div class="input-panel">
           <div class="panel-title">
             <h2>Paste Dump</h2>
-            <label class="toggle">
-              <input id="stripTracking" type="checkbox" checked>
-              <span>Strip tracking</span>
-            </label>
+            <div class="settings-stack">
+              <label class="toggle">
+                <input id="stripTracking" type="checkbox" checked>
+                <span>Strip tracking</span>
+              </label>
+              <label class="param-field" for="customTrackingParams">
+                <span>Custom strip params</span>
+                <input id="customTrackingParams" type="text" spellcheck="false" placeholder="ref, src, rb_clickid">
+              </label>
+            </div>
           </div>
           <textarea id="rawInput" spellcheck="false" aria-label="Raw links"></textarea>
         </div>

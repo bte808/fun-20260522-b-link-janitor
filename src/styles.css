@@ -27,7 +27,8 @@ body {
 }
 
 button,
-textarea {
+textarea,
+input {
   font: inherit;
 }
 
@@ -189,6 +190,31 @@ h2 {
   white-space: nowrap;
 }
 
+.settings-stack {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.param-field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.param-field input {
+  width: min(280px, 42vw);
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fbfcfe;
+  color: var(--ink);
+  padding: 7px 10px;
+}
+
 .toggle input {
   width: 18px;
   height: 18px;
@@ -307,6 +333,18 @@ textarea {
   .panel-title {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .settings-stack {
+    justify-items: stretch;
+  }
+
+  .param-field {
+    text-align: left;
+  }
+
+  .param-field input {
+    width: 100%;
   }
 
   .top-actions,

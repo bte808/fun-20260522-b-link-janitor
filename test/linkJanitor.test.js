@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { analyzeLinks, cleanUrl, formatCsv, formatMarkdown, sampleInput } from "../src/linkJanitor.mjs";
+import { analyzeLinks, cleanUrl, formatCsv, formatMarkdown, parseTrackingParams, sampleInput } from "../src/linkJanitor.mjs";
 
 test("removes common tracking parameters and preserves useful query values", () => {
   const result = cleanUrl("https://example.com/page?utm_source=x&color=blue&fbclid=123#part");
@@ -47,4 +47,15 @@ test("normalizes www links before parsing", () => {
 
   assert.equal(result.items[0].cleanUrl, "https://www.example.org/story");
   assert.equal(result.stats.trackingRemoved, 1);
+});
+
+test("accepts custom tracking parameters for one-off cleanup rules", () => {
+  assert.deepEqual(parseTrackingParams("?ref=share, SRC rb_clickid"), ["ref", "src", "rb_clickid"]);
+
+  const result = cleanUrl("https://example.com/read?ref=share&SRC=email&keep=1", {
+    customTrackingParams: ["ref", "src"]
+  });
+
+  assert.equal(result.clean, "https://example.com/read?keep=1");
+  assert.equal(result.removedParams, 2);
 });

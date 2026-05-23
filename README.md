@@ -8,6 +8,7 @@ It is useful when you copy browser tabs, research notes, product links, newslett
 
 - Extracts `http`, `https`, and `www.` links from pasted text.
 - Removes common tracking parameters such as `utm_*`, `fbclid`, `gclid`, and email campaign IDs.
+- Accepts one-off custom strip parameters such as `ref`, `src`, or an internal campaign key.
 - Deduplicates equivalent cleaned links and keeps source line notes.
 - Groups links by domain and adds lightweight categories like docs, code, reading, watch, and shopping.
 - Generates Markdown or CSV.
@@ -37,8 +38,9 @@ Open `http://localhost:5182/index.html`.
 
 1. Paste a tab dump or use the sample.
 2. Toggle tracking cleanup if needed.
-3. Click `Clean links`.
-4. Copy or download the Markdown/CSV export.
+3. Add custom strip parameters when a source has its own noisy keys.
+4. Click `Clean links`.
+5. Copy or download the Markdown/CSV export.
 
 ## Validation
 

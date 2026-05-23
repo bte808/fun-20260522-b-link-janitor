@@ -1,4 +1,4 @@
-import { analyzeLinks, sampleInput } from "./linkJanitor.mjs";
+import { analyzeLinks, parseTrackingParams, sampleInput } from "./linkJanitor.mjs";
 
 const elements = {
   rawInput: document.querySelector("#rawInput"),
@@ -9,6 +9,7 @@ const elements = {
   copyButton: document.querySelector("#copyButton"),
   downloadButton: document.querySelector("#downloadButton"),
   stripTracking: document.querySelector("#stripTracking"),
+  customTrackingParams: document.querySelector("#customTrackingParams"),
   markdownMode: document.querySelector("#markdownMode"),
   csvMode: document.querySelector("#csvMode"),
   resultsList: document.querySelector("#resultsList"),
@@ -28,6 +29,7 @@ runAnalysis();
 
 elements.analyzeButton.addEventListener("click", runAnalysis);
 elements.stripTracking.addEventListener("change", runAnalysis);
+elements.customTrackingParams.addEventListener("input", runAnalysis);
 elements.sampleButton.addEventListener("click", () => {
   elements.rawInput.value = sampleInput;
   runAnalysis();
@@ -44,7 +46,8 @@ elements.downloadButton.addEventListener("click", downloadExport);
 
 function runAnalysis() {
   lastResult = analyzeLinks(elements.rawInput.value, {
-    stripTracking: elements.stripTracking.checked
+    stripTracking: elements.stripTracking.checked,
+    customTrackingParams: elements.customTrackingParams.value
   });
   render();
 }
@@ -69,6 +72,8 @@ function render() {
   bits.push(`${lastResult.stats.kept} clean links`);
   if (lastResult.stats.duplicates) bits.push(`${lastResult.stats.duplicates} duplicates merged`);
   if (lastResult.stats.invalidLines) bits.push(`${lastResult.stats.invalidLines} text-only lines skipped`);
+  const customCount = parseTrackingParams(elements.customTrackingParams.value).length;
+  if (elements.stripTracking.checked && customCount) bits.push(`${customCount} custom strip rules`);
   elements.statusLine.textContent = bits.join(". ") + ".";
 }
 
