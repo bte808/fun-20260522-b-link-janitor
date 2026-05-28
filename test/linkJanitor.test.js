@@ -59,3 +59,38 @@ test("accepts custom tracking parameters for one-off cleanup rules", () => {
   assert.equal(result.clean, "https://example.com/read?keep=1");
   assert.equal(result.removedParams, 2);
 });
+
+test("removes additional marketing click identifiers conservatively", () => {
+  const result = cleanUrl("https://example.com/page?mkt_tok=abc123&srsltid=xyz789&keep=1");
+
+  assert.equal(result.ok, true);
+  assert.equal(result.clean, "https://example.com/page?keep=1");
+  assert.equal(result.removedParams, 2);
+});
+
+test("adds a privacy-preserving summary to markdown exports", () => {
+  const analysis = analyzeLinks(sampleInput, {
+    generatedAt: new Date("2026-05-22T00:00:00Z")
+  });
+
+  assert.match(
+    analysis.markdown,
+    /Summary: 7 found, 6 kept, 1 duplicate merged, 10 params removed, 1 warning, 2 text-only lines skipped/
+  );
+  assert.doesNotMatch(analysis.markdown, /Bad paste:/);
+});
+
+test("hardens csv exports against spreadsheet formulas", () => {
+  const csv = formatCsv([{
+    title: "=cmd|' /C calc'!A0",
+    cleanUrl: "https://example.com",
+    domain: "example.com",
+    category: "link",
+    sourceLines: [1],
+    duplicates: 0,
+    warnings: ["@formula"]
+  }]);
+
+  assert.match(csv, /"'=cmd\|'/);
+  assert.match(csv, /"'@formula"/);
+});

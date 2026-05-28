@@ -11,8 +11,9 @@ It is useful when you copy browser tabs, research notes, product links, newslett
 - Accepts one-off custom strip parameters such as `ref`, `src`, or an internal campaign key.
 - Deduplicates equivalent cleaned links and keeps source line notes.
 - Groups links by domain and adds lightweight categories like docs, code, reading, watch, and shopping.
-- Generates Markdown or CSV.
-- Copies the result or downloads it as a local file.
+- Generates Markdown or CSV with a short cleanup summary.
+- Escapes spreadsheet formula-looking CSV cells before export.
+- Copies the result or downloads it as a local file, with blocked-clipboard fallback feedback.
 
 ## Why this is handy
 
@@ -39,8 +40,9 @@ Open `http://localhost:5182/index.html`.
 1. Paste a tab dump or use the sample.
 2. Toggle tracking cleanup if needed.
 3. Add custom strip parameters when a source has its own noisy keys.
-4. Click `Clean links`.
-5. Copy or download the Markdown/CSV export.
+4. Click `Clean links` or press `Cmd/Ctrl+Enter` while editing.
+5. Review the cleanup summary, warnings, and grouped links.
+6. Copy or download the Markdown/CSV export.
 
 ## Validation
 

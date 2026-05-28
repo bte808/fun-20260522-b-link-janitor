@@ -26,6 +26,17 @@ export const trackingParams = new Set([
   "vero_id",
   "spm",
   "ref_src",
+  "mkt_tok",
+  "oly_anon_id",
+  "oly_enc_id",
+  "wickedid",
+  "srsltid",
+  "gad_source",
+  "ga_source",
+  "ga_medium",
+  "ga_term",
+  "ga_content",
+  "ga_campaign",
   "_hsenc",
   "_hsmi"
 ]);
@@ -123,7 +134,20 @@ export function analyzeLinks(rawText, options = {}) {
       invalidLines: invalidLines.length,
       duplicates: duplicateCount
     },
-    markdown: formatMarkdown({ items, domains, generatedAt: settings.generatedAt }),
+    markdown: formatMarkdown({
+      items,
+      domains,
+      generatedAt: settings.generatedAt,
+      stats: {
+        found: extracted.length,
+        kept: items.length,
+        domains: domains.length,
+        trackingRemoved,
+        invalidLines: invalidLines.length,
+        duplicates: duplicateCount
+      },
+      warningCount: warnings.length
+    }),
     csv: formatCsv(items)
   };
 }
@@ -187,6 +211,11 @@ export function cleanUrl(input, settings = {}) {
 export function formatMarkdown(result) {
   const date = toDateStamp(result.generatedAt || new Date());
   const lines = [`# Clean Link Pack`, ``, `Generated: ${date}`, ``];
+  const summary = formatSummary(result.stats, result.warningCount);
+
+  if (summary) {
+    lines.push(`Summary: ${summary}`, ``);
+  }
 
   result.domains.forEach((group) => {
     lines.push(`## ${group.domain}`);
@@ -296,11 +325,44 @@ function unique(items) {
 }
 
 function csvCell(value) {
-  return `"${String(value).replace(/"/g, '""')}"`;
+  return `"${sanitizeDelimitedValue(value).replace(/"/g, '""')}"`;
 }
 
 function escapeMarkdown(value) {
   return String(value).replace(/[\[\]]/g, "\\$&");
+}
+
+function sanitizeDelimitedValue(value) {
+  const stringValue = String(value);
+  if (/^[=+\-@\t\r]/.test(stringValue)) {
+    return `'${stringValue}`;
+  }
+  return stringValue;
+}
+
+function formatSummary(stats, warningCount = 0) {
+  if (!stats) return "";
+
+  const parts = [`${stats.found} found`, `${stats.kept} kept`];
+
+  if (stats.duplicates) {
+    parts.push(`${stats.duplicates} ${pluralize("duplicate", stats.duplicates)} merged`);
+  }
+  if (stats.trackingRemoved) {
+    parts.push(`${stats.trackingRemoved} ${pluralize("param", stats.trackingRemoved)} removed`);
+  }
+  if (warningCount) {
+    parts.push(`${warningCount} ${pluralize("warning", warningCount)}`);
+  }
+  if (stats.invalidLines) {
+    parts.push(`${stats.invalidLines} text-only ${pluralize("line", stats.invalidLines)} skipped`);
+  }
+
+  return parts.join(", ");
+}
+
+function pluralize(word, count) {
+  return count === 1 ? word : `${word}s`;
 }
 
 function toDateStamp(date) {

@@ -30,6 +30,8 @@ runAnalysis();
 elements.analyzeButton.addEventListener("click", runAnalysis);
 elements.stripTracking.addEventListener("change", runAnalysis);
 elements.customTrackingParams.addEventListener("input", runAnalysis);
+elements.rawInput.addEventListener("keydown", handleAnalyzeShortcut);
+elements.customTrackingParams.addEventListener("keydown", handleAnalyzeShortcut);
 elements.sampleButton.addEventListener("click", () => {
   elements.rawInput.value = sampleInput;
   runAnalysis();
@@ -71,6 +73,8 @@ function render() {
   const bits = [];
   bits.push(`${lastResult.stats.kept} clean links`);
   if (lastResult.stats.duplicates) bits.push(`${lastResult.stats.duplicates} duplicates merged`);
+  if (lastResult.stats.trackingRemoved) bits.push(`${lastResult.stats.trackingRemoved} params removed`);
+  if (lastResult.warningCount) bits.push(`${lastResult.warningCount} warnings to review`);
   if (lastResult.stats.invalidLines) bits.push(`${lastResult.stats.invalidLines} text-only lines skipped`);
   const customCount = parseTrackingParams(elements.customTrackingParams.value).length;
   if (elements.stripTracking.checked && customCount) bits.push(`${customCount} custom strip rules`);
@@ -126,6 +130,14 @@ function addChip(parent, text, tone = "") {
   parent.append(chip);
 }
 
+function handleAnalyzeShortcut(event) {
+  if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+    event.preventDefault();
+    runAnalysis();
+    elements.exportText.focus();
+  }
+}
+
 async function copyExport() {
   const value = elements.exportText.value;
   if (!value) {
@@ -137,14 +149,21 @@ async function copyExport() {
     await navigator.clipboard.writeText(value);
     elements.statusLine.textContent = "Copied clean export.";
   } catch {
+    elements.exportText.focus();
     elements.exportText.select();
-    document.execCommand("copy");
-    elements.statusLine.textContent = "Selected export for copy.";
+    const copied = document.execCommand("copy");
+    elements.statusLine.textContent = copied
+      ? "Copied clean export."
+      : "Clipboard blocked. Export selected for Cmd/Ctrl+C.";
   }
 }
 
 function downloadExport() {
   const value = elements.exportText.value;
+  if (!value) {
+    elements.statusLine.textContent = "Nothing to download.";
+    return;
+  }
   const extension = exportMode === "csv" ? "csv" : "md";
   const mime = exportMode === "csv" ? "text/csv" : "text/markdown";
   const blob = new Blob([value], { type: `${mime};charset=utf-8` });
